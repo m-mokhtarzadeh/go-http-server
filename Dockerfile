@@ -1,9 +1,10 @@
-FROM golang:1.20.0 as build
-COPY . /usr/src/
-WORKDIR /usr/src/
-RUN go build -o server main.go
+FROM golang:1.20.0-alpine as build
+COPY . $GOPATH/src/go-http-server
+WORKDIR $GOPATH/src/go-http-server
+RUN go build -v -o /go-http-server/server main.go
 
-FROM scratch
-COPY --from=build /usr/src/server /server
+FROM alpine:3.17.1
+COPY --from=build /go-http-server/server /server
 ENV SERVER_PORT=80
+EXPOSE 80
 ENTRYPOINT ["/server"]
